@@ -1,0 +1,73 @@
+--- \\192.168.36.148\leo\workspace-12.1.1\ROMED8QM-2T_L0.08.02_workspace\source\libipmimsghndlr-3.351.0-src\data\App\IPMDevice\IPMDevice.c	2020-02-21 17:48:33.000000000 +0800
++++ \\192.168.36.148\leo\workspace-12.2\E3C246D2I_workspace\source\libipmimsghndlr-3.351.0-src\data\App\IPMDevice\IPMDevice.c	2020-11-27 12:01:35.000000000 +0800
+@@ -69,12 +69,13 @@
+ 
+ /*** Module Variables ***/
+ 
+ #define WORKING_STATE 0x0
+ #define S1_SLEEPING_STATE  0x1
+ 
++static INT8U firsttime = 1;
+ static INT8U  MfgID[]       = {0xD6,0xC1,0x00};//     /**< Contains Manufacturer ID */
+ static INT16U g_ProdID      = 0xaabb;
+ 
+ #define FW_INFO_FILE "/proc/ractrends/Helper/FwInfo"
+ #define WARM_RESET_STATUS_FLAG "/var/tmp/warmresetinprogress"
+ 
+@@ -88,21 +89,22 @@
+     if(fp == NULL)
+     {
+         IPMI_DBG_PRINT("Unable to find firmware version info!!!\n");
+         *Major = 0;
+         *Minor = 0;
+         *Rev = 0;
++        firsttime = 1;
+         return;
+     }
+-
+     if(fgets(aline,79,fp)==NULL){
+         IPMI_DBG_PRINT("Unable to find firmware version info!!!\n");
+         *Major = 0;
+         *Minor = 0;
+         *Rev = 0;
+         fclose(fp);
++        firsttime = 1;
+         return;
+     }
+     
+     for(i = 0; i < 79; i++) 
+     {
+         if (aline[i] == '\0')
+@@ -127,31 +129,30 @@
+ int
+ GetDevID (_NEAR_ INT8U* pReq, INT8U ReqLen, _NEAR_ INT8U* pRes,_NEAR_ int BMCInst)
+ {
+     _NEAR_ GetDevIDRes_T*  pGetDevIDRes = (_NEAR_ GetDevIDRes_T*) pRes;
+     static unsigned int Major,Minor,Rev;
+     static unsigned char MinorBCD;
+-    static int firsttime = 1;
+     int inFlashMode = IsCardInFlashMode();
+ 
+     if(0)
+     {
+     	ReqLen=ReqLen; /* -Wextra, fix for unused parameters */
+     	pReq=pReq;
+     }
+     if(firsttime == 1)
+     {
++        firsttime = 0;
+         //	printf("Calling get firmware version only for first time\n");
+         GetFirmwareVersion(&Major,&Minor,&Rev);
+         MinorBCD = ((Minor/10)<<4)+(Minor%10);
+         /* Initialize/Read Mfg ID and Product ID */
+         if(g_PDKHandle[PDK_GETMFGPRODID] != NULL)
+         {
+             ((int(*)(INT8U *, INT16U *, INT8U))g_PDKHandle[PDK_GETMFGPRODID]) (MfgID, &g_ProdID, BMCInst);
+         }
+-        firsttime = 0;
+     }
+ 
+     pGetDevIDRes->CompletionCode      = CC_NORMAL;
+     pGetDevIDRes->DeviceID            = DEVICE_ID;
+     pGetDevIDRes->DevRevision         = IPMI_DEV_REVISION;
+     pGetDevIDRes->FirmwareRevision1 = Major | (inFlashMode << 7);

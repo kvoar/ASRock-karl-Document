@@ -1,0 +1,3 @@
+gpiotool 0 --get-data
+
+編號 0 ->GPIOA0

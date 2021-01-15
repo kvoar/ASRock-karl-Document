@@ -1,0 +1,8 @@
+i2c-test
+
+i2c-test -b 2 --scan
+
+i2c-test -b 2 -s 0x58 -rc 2 -d 0x88
+
+i2c-test -b 2 -s 0x58 -rc 2 -d 0x3b 0x50
+

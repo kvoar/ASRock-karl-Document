@@ -1,0 +1,80 @@
+#1.
+#apt install slapd ldap-utils
+#admin password: ldap
+
+#2.
+#dpkg-reconfigure slapd (domain: ldapserver.com)
+#sudo dpkg-reconfigure slapd
+#domain: ldapserver.com (dc=ldapserver,dc=com)
+#organization: asrockrack
+#admin password: ldap
+
+#3.
+#ldapadd -x -D cn=admin,dc=ldapserver,dc=com -W -f ldap_data.ldif
+#password: ldap
+
+#4.
+#ldapsearch -x -LLL -b dc=ldapserver,dc=com 'uid=jeff'
+
+#BMC setup:
+#192.168.12.59
+#Port: 389
+#Bind DN: cn=admin,dc=ldapserver,dc=com
+#password: ldap
+#search base: dc=ldapserver,dc=com
+#Attribute: cn
+
+#role:
+#group: ldapgroup
+#domain: dc=ldapserver,dc=com
+
+#user(group)
+dn: ou=user,dc=ldapserver,dc=com
+ou: user
+objectClass: organizationalUnit
+
+#group
+dn: ou=testgroup,dc=ldapserver,dc=com
+ou: bmc
+objectClass: top
+objectClass: organizationalUnit
+
+dn: cn=bmc,ou=testgroup,dc=ldapserver,dc=com
+objectClass: groupOfNames
+cn: bmc
+member: cn=jeff,ou=user,dc=ldapserver,dc=com
+member: cn=ldaptest,ou=user,dc=ldapserver,dc=com
+
+#users
+dn: cn=jeff,ou=user,dc=ldapserver,dc=com
+uid: jeff
+objectClass: uidObject
+objectClass: top
+objectClass: person
+sn: N/A
+cn: jeff
+userPassword: asrock#123
+
+#users
+dn: cn=ldaptest,ou=user,dc=ldapserver,dc=com
+uid: ldaptest
+objectClass: uidObject
+objectClass: top
+objectClass: person
+sn: N/A
+cn: ldaptest
+userPassword: asrock#123
+
+#BMC LDAP setting:
+#General LDAP/E-directory Settings
+#Server Address > 192.168.12.59
+#Port > default 389
+#Bind DN > cn=admin,dc=ldapserver,dc=com
+#Password > ldap
+#Search Base > dc=ldapserver,dc=com
+#Attribute of User Login > cn
+#
+#Role Groups
+#Group Name > bmc
+#Group Domain > ou=testgroup,dc=ldapserver,dc=com
+#Group Privilege > Administrator

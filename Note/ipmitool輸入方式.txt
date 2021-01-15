@@ -1,0 +1,6 @@
+ipmitool -H 127.0.0.1 -U admin -P admin raw 0x06 0x01
+
+
+
+
+

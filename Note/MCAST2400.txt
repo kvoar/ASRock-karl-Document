@@ -1,0 +1,1 @@
+http://192.168.36.8/BMC/AST2400/platforms/greenlow/e3c236d4m-4l.git

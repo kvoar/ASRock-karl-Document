@@ -1,0 +1,6 @@
+regmemapp
+
+regmemapp -w -a 0x1e6e2000 -l 0x04 -d 0x1688A8A8
+regmemapp -r -a 0x1e6e2000 -l 0x04 -f 0x10
+
+
