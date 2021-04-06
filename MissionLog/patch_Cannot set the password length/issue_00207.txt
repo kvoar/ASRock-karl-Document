@@ -1,0 +1,15 @@
+ 	+-------------------------------------------------------+
+	|	BMC Firmware feature document			|
+	+-------------------------------------------------------+
+	|	BMC Chipset	: ASPEED 2500			|
+	+-------------------------------------------------------+
+;-----------------------------------------------------------------------;
+Issue Number	: 
+Synopsis	: Cannot set the password length to 20 characters and the user name to 16 characters
+Description 	: Cannot set the password length to 20 characters and the user name to 16 characters
+Packages File	: libipmi_uds_session.c.patch ,libipmi_AppDevice.c.patch
+Procedure	: //Apply the patch to code(base on RR11-6_2018-12-03).
+Verify		: Check whether the password length is set to 20 characters and the user name is set to 16 characters is normal.
+Note		: N/A
+Engineer Name	: Karl Chang
+Release Date	: 12-07-2020 Mon

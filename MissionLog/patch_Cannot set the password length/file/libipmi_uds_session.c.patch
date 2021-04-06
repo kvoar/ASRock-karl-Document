@@ -1,0 +1,28 @@
+--- /windowsDisk/MDS_13_Workspace/B550D4ID-2L2T_workspace/source/libipmi-6.49.0.0.0-src/data/libipmi_uds_session.c	2020-12-08 16:57:41.651628166 +0800
++++ /windowsDisk/MDS_13_Workspace/B550D4ID-2L2T_patch/source/libipmi-6.49.0.0.0-src/data/libipmi_uds_session.c	2020-12-08 17:53:22.225021969 +0800
+@@ -460,22 +460,23 @@
+     SetUserPswdReq_T UDSReqSetUserPsswd;
+     SetUserPswdRes_T UDSResSetUserPsswd;
+     uint32 reslen = 0;
+     int retval = 0;
+ 
+     /*First check whether it is a 20 byte password*/
+     memset(&UDSReqSetUserPsswd,0,sizeof(SetUserPswdReq_T));
+     memset(&UDSResSetUserPsswd,0,sizeof(SetUserPswdRes_T));
+     UDSReqSetUserPsswd.UserID = (INT8U)(BIT7|UserID);
+     UDSReqSetUserPsswd.Operation = 0x03;
+-    retval = snprintf((char*)UDSReqSetUserPsswd.Password, sizeof(UDSReqSetUserPsswd.Password),"%s",(char *)Password);
+-    if(retval < 0 || retval >= (signed int)sizeof(UDSReqSetUserPsswd.Password))
++    //Karl Chang   17:48 12-08-2020  Fix Setting Password length to 20 Characters wrong//
++    retval = snprintf((char*)UDSReqSetUserPsswd.Password, (sizeof(UDSReqSetUserPsswd.Password)+1),"%s",(char *)Password);
++    if(retval < 0 || retval > (signed int)sizeof(UDSReqSetUserPsswd.Password))
+     {
+ 	    TCRIT("Buffer Overflow\n");
+ 	    return -1;
+     }
+     reslen = sizeof(SetUserPswdRes_T);
+     retval =  Send_RAW_IPMI2_0_UDS_Command(pSession,
+                                                                               DEFAULT_NET_FN_LUN,CMD_SET_USER_PASSWORD,
+                                                                               (uint8 *)&UDSReqSetUserPsswd,sizeof(SetUserPswdReq_T),
+                                                                               (uint8 *)&UDSResSetUserPsswd,&reslen,
+                                                                               AuthEnable,timeout);

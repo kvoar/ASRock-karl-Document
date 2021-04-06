@@ -1,0 +1,53 @@
+--- /windowsDisk/MDS_13_Workspace/B550D4ID-2L2T_workspace/source/libipmi-6.49.0.0.0-src/data/libipmi_AppDevice.c	2020-12-08 16:57:01.035356568 +0800
++++ /windowsDisk/MDS_13_Workspace/B550D4ID-2L2T_patch/source/libipmi-6.49.0.0.0-src/data/libipmi_AppDevice.c	2020-12-08 17:53:19.933010566 +0800
+@@ -1223,44 +1223,46 @@
+ 	SetUsrPayldAccRes_T ResSetUserAccessPayload_SOL;
+ 	if(0){
+ 		NetworkPriv=NetworkPriv;
+ 	}
+ 
+ 	//we dont do changeusername in moduser..for that you delete
+ 	//and readd a new user...that is the best thing to do with linux files
+ 	if(ModifyUserName == 1)
+ 	{
+ 		ReqSetUserName.UserID = UserID & 0x7F;
+-		ret = snprintf((char*)ReqSetUserName.UserName,sizeof(ReqSetUserName.UserName),"%s",(char*)UserName);
+-		if(ret < 0 || ret >= (signed int)sizeof(ReqSetUserName.UserName))
++		//Karl Chang   17:48 12-08-2020  Fix Setting UserName 16 Characters wrong//
++		ret = snprintf((char*)ReqSetUserName.UserName,(sizeof(ReqSetUserName.UserName)+1),"%s",(char*)UserName);
++		if(ret < 0 || ret > (signed int)sizeof(ReqSetUserName.UserName))
+ 		{
+ 			TCRIT("Buffer Overflow\n");
+ 			return -1;
+ 		}
+ 		wRet = IPMICMD_SetUser(pSession,&ReqSetUserName,&ResSetUserName,timeout);
+ 		if(wRet != 0)
+ 		{
+ 			TCRIT("Error setting user name\n");
+ 			return wRet;
+ 		}
+ 		else
+ 		{
+ 			TDBG("setting user name success\n");
+ 		}
+ 	}
+ 
+ 	if(IsPwdChange)
+ 	{
+ 		ReqSetUserPswd.UserID = UserID;
+ 		ReqSetUserPswd.Operation = 0x02; //enable and set password
+-		ret = snprintf((char*)ReqSetUserPswd.Password,sizeof(ReqSetUserPswd.Password),"%s",(char*)ClearPswd);
+-		if(ret < 0 || ret >= (signed int)sizeof(ReqSetUserPswd.Password))
++		//Karl Chang   17:48 12-08-2020  Fix Setting Password length to 20 Characters wrong//
++		ret = snprintf((char*)ReqSetUserPswd.Password,(sizeof(ReqSetUserPswd.Password)+1),"%s",(char*)ClearPswd);
++		if(ret < 0 || ret > (signed int)sizeof(ReqSetUserPswd.Password))
+ 		{
+ 			TCRIT("Buffer Overflow\n");
+ 			return -1;
+ 		}
+ 		wRet = IPMICMD_SetUserPassword(pSession,&ReqSetUserPswd,&ResSetUserPswd,timeout);
+ 		if(wRet != 0)
+ 		{
+ 			TCRIT("Error setting user password..Set password operation\n");
+ 			return wRet;
+ 		}
