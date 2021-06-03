@@ -5,3 +5,7 @@ eip.asrock.com.tw ME2000063 19830118
 公司git 192.168.36.8 karl_chang kv112829
 
 私人 github.com kvoarz@gmail.com 常用的密碼 
+
+公司 wifi ASRockRack_T36 54161333
+
+codiMD 帳號 Karl_Chang@asrockrack.com kv112829
